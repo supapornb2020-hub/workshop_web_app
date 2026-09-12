@@ -26,8 +26,7 @@ var todos = new List<TodoGetDto>
 app.MapGet("/api/todos", () =>
     Results.Ok(todos));
 
-app.MapGet("/api/todos", () =>
-    Results.Ok(todos));
+// filter by id
 
 app.MapGet("/api/todos/{id}", (int id) =>
 {
@@ -37,7 +36,15 @@ app.MapGet("/api/todos/{id}", (int id) =>
         ? Results.NotFound()
         : Results.Ok(todo);
 });
+// Post new todo
+app.MapPost("/api/todos", (TodoPostDto dto) =>
+{
+    var nextId = todos.Count == 0 ? 1 : todos.Max(x => x.Id) + 1;
+    var todo = new TodoGetDto(nextId, dto.Title, false);
+    todos.Add(todo);
 
+    return Results.Created($"/api/todos/{todo.Id}", todo);
+});
 
 
 app.Run();
